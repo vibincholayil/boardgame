@@ -1,26 +1,46 @@
-pipeline {    
-    agent any 
-    tools {
-        jdk 'jdk17'
-        maven 'maven3'
+pipeline {
+    agent any
+    
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
     }
 
-    stages {   
-        stage('Compile') {
+    stages {
+        stage('Checkout') {
             steps {
-                sh 'mvn compile'
+                git branch: 'main', url: 'https://github.com/careerbytecode/boardgame.git'
             }
         }
         
         stage('Test') {
             steps {
-                sh 'mvn test'
+               sh 'mvn test'
+            }
+        }
+        
+        
+        stage('Quality Check') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh '''
+                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=boardgame -Dsonar.projectKey=boardgame \
+                    -Dsonar.java.binaries=.
+                    '''
+                }
             }
         }
         
         stage('Build') {
             steps {
-                sh 'mvn package'
+                sh 'mvn clean package'
+            }
+        }
+        
+        stage('Publish to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: '', jdk: '', maven: 'maven3', mavenSettingsConfig: 'maven-settings', traceability: true) {
+                    sh 'mvn deploy'
+                }               
             }
         }
     }
