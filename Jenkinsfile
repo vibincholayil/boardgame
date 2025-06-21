@@ -21,11 +21,14 @@ pipeline {
         
         stage('Quality Check') {
             steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''
-                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=boardgame -Dsonar.projectKey=boardgame \
-                    -Dsonar.java.binaries=.
-                    '''
+                timeout(time: 60, unit: 'SECONDS') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh '''
+                        $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=boardgame -Dsonar.projectKey=boardgame \
+                        -Dsonar.java.binaries=.
+                        '''
+                    }
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
