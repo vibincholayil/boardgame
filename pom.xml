@@ -11,7 +11,7 @@
 	<groupId>com.javaproject</groupId>
 	<artifactId>Boardgame_project</artifactId>
 	<version>0.0.4</version>
-	<name>database_service_project</name>
+	<name>Boardgame_project</name>
 	<description>Project for Spring Boot</description>
 	<packaging>jar</packaging>
 	<properties>
